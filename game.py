@@ -1,8 +1,11 @@
 from wave import Wave
 from board import *
+import logging
+
+
 class Game:
     def __init__(self):
-        # What this is doing, is that it is creating a board, multiple waves, appending them to the total list of waves, 
+        # What this is doing, is that it is creating a board, multiple waves, appending them to the total list of waves,
         # creating the list of path coordinates for the enemy to travel on, and creating the base.
         # The base is your base, you want to defend it from attacking enemies by placing towers down.
         # The very first time it asks you to place a tower it automaticalaly places one down for you otherwise you would
@@ -21,43 +24,49 @@ class Game:
         self.create_wave([4, 9], 24, 95, 9, 9)
         self.create_wave([4, 9], 31, 99, 10, 10)
         # adding path in order
-        self.board.add_path_in_order(Square(4,9, None, True))
-        self.board.add_path_in_order(Square(5,9, None, True))
-        self.board.add_path_in_order(Square(6,9, None, True))
-        self.board.add_path_in_order(Square(6,8, None, True))
-        self.board.add_path_in_order(Square(6,7, None, True))
-        self.board.add_path_in_order(Square(6,6, None, True))
-        self.board.add_path_in_order(Square(5,6, None, True))
-        self.board.add_path_in_order(Square(4,6, None, True))
-        self.board.add_path_in_order(Square(3,6, None, True))
-        self.board.add_path_in_order(Square(3,5, None, True))
-        self.board.add_path_in_order(Square(3,4, None, True))
-        self.board.add_path_in_order(Square(3,3, None, True))
-        self.board.add_path_in_order(Square(3,2, None, True))
-        self.board.add_path_in_order(Square(3,1, None, True))
+        self.board.add_path_in_order(Square(4, 9, None, True))
+        self.board.add_path_in_order(Square(5, 9, None, True))
+        self.board.add_path_in_order(Square(6, 9, None, True))
+        self.board.add_path_in_order(Square(6, 8, None, True))
+        self.board.add_path_in_order(Square(6, 7, None, True))
+        self.board.add_path_in_order(Square(6, 6, None, True))
+        self.board.add_path_in_order(Square(5, 6, None, True))
+        self.board.add_path_in_order(Square(4, 6, None, True))
+        self.board.add_path_in_order(Square(3, 6, None, True))
+        self.board.add_path_in_order(Square(3, 5, None, True))
+        self.board.add_path_in_order(Square(3, 4, None, True))
+        self.board.add_path_in_order(Square(3, 3, None, True))
+        self.board.add_path_in_order(Square(3, 2, None, True))
+        self.board.add_path_in_order(Square(3, 1, None, True))
         # Create base
-        self.board.set_square(Square(3,0, None, False, True))
+        self.board.set_square(Square(3, 0, None, False, True))
+        logging.info("game created, board size: " + str(10) + "," + str(10))
+        logging.info("game created, waves size: " + str(len(self.waves)))
 
     # creates wave with list of enemies.
     def create_wave(self, start_of_enemy_coords, enemy_damage, enemy_health, num_enemies, wave_number):
         w = Wave(wave_number)
         for i in range(num_enemies):
             i += 0
-            w.add_enemy(Enemy(enemy_health, enemy_damage, 1, start_of_enemy_coords))
+            w.add_enemy(Enemy(enemy_health, enemy_damage,
+                              1, start_of_enemy_coords))
         self.waves.append(w)
 
-    
     # This entire function is about placing a tower with having the coordinates not be ("blah", "yada"), but (5, 5).
+
     def tower_ask_v2(self, wave_number):
+        logging.debug("tower v2 ask, wave number: " + str(wave_number))
         int_ask = -1
         continue_asking = True
         while continue_asking:
             if wave_number == -1:
                 ask = input("How many towers do you want to place? 0 or 1: ")
             elif wave_number > -1 and wave_number < 9:
-                ask = input("How many towers do you want to place? 0, 1, or 2: ")
+                ask = input(
+                    "How many towers do you want to place? 0, 1, or 2: ")
             elif wave_number >= 9:
-                ask = input("How many towers do you want to place? 0, 1, 2, or 3: ")
+                ask = input(
+                    "How many towers do you want to place? 0, 1, 2, or 3: ")
             # The try/except checks whether they enter "blah" into a coordinate into a number.
             try:
                 int_ask = int(ask)
@@ -78,30 +87,36 @@ class Game:
                 i += 0
                 continue_asking = True
                 while continue_asking:
-                    input_x = input("Please type in the x coordinate for your tower. ")
-                    input_y = input("Please type in the y coordinate for your tower. ")
+                    input_x = input(
+                        "Please type in the x coordinate for your tower. ")
+                    input_y = input(
+                        "Please type in the y coordinate for your tower. ")
                     x = 0
                     y = 0
                     try:
-                        # The next 5 lines check if the tower that you are placing is not a number, 
+                        # The next 5 lines check if the tower that you are placing is not a number,
                         # on the path, on the base, and on another tower.
                         x = int(input_x)
                         y = int(input_y)
                         path_check = self.board.get_square(x, y).get_is_path()
                         base_check = self.board.get_square(x, y).get_is_base()
-                        tower_check = self.board.get_square(x, y).get_tower() != None
+                        tower_check = self.board.get_square(
+                            x, y).get_tower() != None
                         if not path_check and not base_check and not tower_check:
                             self.board.get_towers().append(Towers(x, y, "archer", 5))
                             print("Ok.")
-                            self.board.set_square(Square(x, y, Towers(x, y, "archer", 5), False))
+                            self.board.set_square(
+                                Square(x, y, Towers(x, y, "archer", 5), False))
                             continue_asking = False
                             break
                         else:
-                            print("Sorry, you cannot place a tower there. Please try again.")
+                            print(
+                                "Sorry, you cannot place a tower there. Please try again.")
 
                     except ValueError:
-                        print("This time enter an integer from 0 to " + str(self.board.get_x() - 1) + ".")
-        # This else creates a tower in a random spot if you are just starting the game. If you are in later waves, 
+                        print("This time enter an integer from 0 to " +
+                              str(self.board.get_x() - 1) + ".")
+        # This else creates a tower in a random spot if you are just starting the game. If you are in later waves,
         # this does not happen.
         else:
             if wave_number == -1:
@@ -114,12 +129,13 @@ class Game:
                     k = random.randint(0, self.board.get_y())
                 elif self.board.get_square(j, k).get_is_base() == False or self.board.get_square(j, k).get_is_path() == False:
                     self.board.get_towers().append(Towers(j, k, "archer", 5))
-                    self.board.set_square(Square(j, k, Towers(j, k, "archer", 5), False)) 
+                    self.board.set_square(
+                        Square(j, k, Towers(j, k, "archer", 5), False))
             else:
                 print("Ok.")
             continue_asking = False
 
-    # This makes every tower shoot once (if there's an enemy), gives the enemy a chance to move, 
+    # This makes every tower shoot once (if there's an enemy), gives the enemy a chance to move,
     # gives the enemy a chance to attack the base, and starts a new wave if the last one is done.
     def do_1_turn(self):
         is_game_over = False
@@ -144,10 +160,12 @@ class Game:
             new_x, new_y = e.move(self.board.get_ordered_path())
             if new_x == old_x and new_y == old_y:
                 self.board.base_take_damage(e.damage)
-        
+
         # making the towers shoot
         for tower in self.board.get_towers():
             if_enemy, damage, coords = tower.shoot(self.board.convert())
+            logging.debug("tower shooting: " + str(if_enemy) +
+                          ", damage: " + str(damage) + ", coords: " + str(coords))
             coords = correct_coords(coords[0], coords[1], self.board.get_y())
             if if_enemy:
                 for enemy in self.board.get_enemies():
@@ -159,8 +177,9 @@ class Game:
         # checks whether you won or lost
         if (len(self.waves) == 0 and len(self.board.enemies) == 0) or self.board.get_base_health() == 0:
             is_game_over = True
-        #time.sleep(wave_speed)
+        # time.sleep(wave_speed)
         time.sleep(0.7)
+        logging.debug("ending a turn")
         return is_game_over
 
     # starts a game.
@@ -174,20 +193,21 @@ class Game:
         self.board.display()
 
 # makes a game.
+
+
 def main():
+    logging.basicConfig(filename='tower.log',
+                        format='%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d %(message)s',
+                        level=logging.DEBUG)
+    logging.info("Tower Defense Game started")
     game = Game()
     game.start()
     if game.board.get_base_health() > 0:
         print("Congratulations! You won! Game over.")
     else:
         print("GAME OVER. YOU LOSE.")
+    logging.shutdown()
+
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
